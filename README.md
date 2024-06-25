@@ -124,9 +124,9 @@ Der Hub etabliert einen Hotspot, mit welchem sich die Nanos und das Tablet verbi
 Die Redis-Datenbank speichert folgende Informationen strukturiert:
 
 **musicians**
-mac_address | ip | uzepatscher | register
------------ | -- | ----------- | --------
-25:df:we:ep:32: | 192.168.220.24 | Samuel R. | Drums
+| mac_address     | ip             | uzepatscher | register |
+| --------------- | -------------- | ----------- | -------- |
+| 25:df:we:ep:32: | 192.168.220.24 | Samuel R.   | Drums    |
 
 **songs**
 song |  
@@ -139,8 +139,18 @@ Der Hub stellt folgende Endpunkte zur Verfügung
 
 **für Nanos**
 `GET /nano/sequences` liefert in JSON-Format alle verfügbaren Sequenzen zrück.
+`GET /nano/register` Nano registriert sich.
+`GET /nano/heartbeat` Nano zeigt, dass er am Leben ist.
 
 **für Tablet**
+`GET /tablet/sequences` liefert in JSON-Format alle verfügbaren Sequenzen zrück.
+`GET /tablet/songs` liefert in JSON-Format alle verfügbaren Songs
+`GET /tablet/queue` liefert in JSON-Format die aktuelle Queue zurück
+`POST /tablet/queue` Song zur Queue hinzufügen
+`DELETE /tablet/queue` Song von Queue entfernen
+`POST /tablet/tap` In einen Song-Part tapen (z.B. von Refrain in Strophe)
+`POST /tablet/command` Manueller Command an alle Nanos senden
+
 
 
 
@@ -200,66 +210,66 @@ Edi wird in MIDI Connections ein Interface einbauen, welches es einfach macht, d
 
 Wenn sich das Register matcht, dann werden alle anderen Werte "applied".
 
-Kanal | Beschriftung | Beschreibung | Duration | Velocity | Bemerkungen
--- | -- | -- | -- | -- | --
-1 | Ganze Gugge | überschreibt alles | Aktiv | - |
-2 | Drums |  | Aktiv | - |
-3 | Wäggeli |  | Aktiv | - |
-4 | Pauken |  | Aktiv | - |
-5 | Lira |  | Aktiv | - |
-6 | Chinellen |  | Aktiv | - |
-7 | 1. Trompete |  | Aktiv | - |
-8 | 2. Trompete |  | Aktiv | - |
-9 | 1. Posaune |  | Aktiv | - |
-10 | 2. Posaune |  | Aktiv | - |
-11 | 3. Posaune |  | Aktiv | - |
-12 | Bässe |  | Aktiv | - |
-13 | Bässe Instrumente |  | Aktiv | - |
+| Kanal | Beschriftung      | Beschreibung       | Duration | Velocity | Bemerkungen |
+| ----- | ----------------- | ------------------ | -------- | -------- | ----------- |
+| 1     | Ganze Gugge       | überschreibt alles | Aktiv    | -        |
+| 2     | Drums             |                    | Aktiv    | -        |
+| 3     | Wäggeli           |                    | Aktiv    | -        |
+| 4     | Pauken            |                    | Aktiv    | -        |
+| 5     | Lira              |                    | Aktiv    | -        |
+| 6     | Chinellen         |                    | Aktiv    | -        |
+| 7     | 1. Trompete       |                    | Aktiv    | -        |
+| 8     | 2. Trompete       |                    | Aktiv    | -        |
+| 9     | 1. Posaune        |                    | Aktiv    | -        |
+| 10    | 2. Posaune        |                    | Aktiv    | -        |
+| 11    | 3. Posaune        |                    | Aktiv    | -        |
+| 12    | Bässe             |                    | Aktiv    | -        |
+| 13    | Bässe Instrumente |                    | Aktiv    | -        |
 
 **Farben**
 
-Kanal | Beschriftung | Beschreibung | Duration | Velocity | Bemerkungen
--- | -- | -- | -- | -- | --
-16 | R | Rot | Dauer | Lichtstärke 0 - 100% |
-17 | G | Grün | Dauer | Lichtstärke 0 - 100% |
-18 | B | Blau | Dauer | Lichtstärke 0 - 100% |
-19 | RB | Regenbogen | Dauer | Lichtstärke 0 - 100% | Geschwindigkeit = 3s
+| Kanal | Beschriftung | Beschreibung | Duration | Velocity             | Bemerkungen          |
+| ----- | ------------ | ------------ | -------- | -------------------- | -------------------- |
+| 16    | R            | Rot          | Dauer    | Lichtstärke 0 - 100% |
+| 17    | G            | Grün         | Dauer    | Lichtstärke 0 - 100% |
+| 18    | B            | Blau         | Dauer    | Lichtstärke 0 - 100% |
+| 19    | RB           | Regenbogen   | Dauer    | Lichtstärke 0 - 100% | Geschwindigkeit = 3s |
 
 **Einstellungen**
 
 Diese Einstellungen können andere Effekte beeinflussen.
 
-Kanal | Beschriftung | Beschreibung | Duration | Velocity | Bemerkungen
--- | -- | -- | -- | -- | --
-25 | Speed | Geschwindigkeit des Effekts in ms | Gültigkeitsbereich | Speed 0 - 10'000ms
-26 | Länge | Länge des Effekts in Pixel | Gültigkeitsbereich | Anzahl LED 0 - 100
-27 | Lichtstärke | Intensität des Lichts | Gültigkeitsbereich | Lichtstärke 0 - 100% | überschreibt alle anderen Lichtstärken
+| Kanal | Beschriftung | Beschreibung                      | Duration           | Velocity             | Bemerkungen                            |
+| ----- | ------------ | --------------------------------- | ------------------ | -------------------- | -------------------------------------- |
+| 25    | Speed        | Geschwindigkeit des Effekts in ms | Gültigkeitsbereich | Speed 0 - 10'000ms   |
+| 26    | Länge        | Länge des Effekts in Pixel        | Gültigkeitsbereich | Anzahl LED 0 - 100   |
+| 27    | Lichtstärke  | Intensität des Lichts             | Gültigkeitsbereich | Lichtstärke 0 - 100% | überschreibt alle anderen Lichtstärken |
 
 **Effekte**
 
 Wenn kein Effekt angewählt ist, strahlen die LEDs einfach die gewählte Farbe. Effekte sind nicht mischbar, es wird der erste Kanal genommen, welcher verfügbar ist
 
-Kanal | Beschriftung | Beschreibung | Duration | Velocity | Bemerkungen
--- | -- | -- | -- | -- | --
-30 | Lauflicht | Tatzelwurm an LED-Leuchten | Dauer | Lichtstärke 0 - 100% | Speed, Länge
-31 | Glitzern | Zufälliges Blinken aller LED | Dauer | Lichtstärke 0 - 100% |
-32 | Welle | Wellenbewegung entlang der LEDs | Dauer | Lichtstärke 0 - 100% | Speed, Länge
-33 | Pulsieren | LED pulsiert an/aus | Dauer | Lichtstärke 0 - 100% | Speed
-34 | Farbwechsel | Wechsel der Farben über Zeit | Dauer | Lichtstärke 0 - 100% | Speed
-35 | Strobo | Stroboskop-Effekt | Dauer | Lichtstärke 0 - 100% | Speed
-36 | Fade | Langsames Ein- und Ausblenden | Dauer | Lichtstärke 0 - 100% | Speed
-37 | Herzschlag | Simulation eines Herzschlags | Dauer | Lichtstärke 0 - 100% | Speed
-38 | Meteor | Lichtkugeln ziehen über die LEDs | Dauer | Lichtstärke 0 - 100% | Geschwindigkeit, Länge (Pixel)
-39 | Flackern | LEDs flackern wie Kerzenlicht | Dauer | Lichtstärke 0 - 100% |
+| Kanal | Beschriftung | Beschreibung                     | Duration | Velocity             | Bemerkungen                    |
+| ----- | ------------ | -------------------------------- | -------- | -------------------- | ------------------------------ |
+| 30    | Lauflicht    | Tatzelwurm an LED-Leuchten       | Dauer    | Lichtstärke 0 - 100% | Speed, Länge                   |
+| 31    | Glitzern     | Zufälliges Blinken aller LED     | Dauer    | Lichtstärke 0 - 100% |
+| 32    | Welle        | Wellenbewegung entlang der LEDs  | Dauer    | Lichtstärke 0 - 100% | Speed, Länge                   |
+| 33    | Pulsieren    | LED pulsiert an/aus              | Dauer    | Lichtstärke 0 - 100% | Speed                          |
+| 34    | Farbwechsel  | Wechsel der Farben über Zeit     | Dauer    | Lichtstärke 0 - 100% | Speed                          |
+| 35    | Strobo       | Stroboskop-Effekt                | Dauer    | Lichtstärke 0 - 100% | Speed                          |
+| 36    | Fade         | Langsames Ein- und Ausblenden    | Dauer    | Lichtstärke 0 - 100% | Speed                          |
+| 37    | Herzschlag   | Simulation eines Herzschlags     | Dauer    | Lichtstärke 0 - 100% | Speed                          |
+| 38    | Meteor       | Lichtkugeln ziehen über die LEDs | Dauer    | Lichtstärke 0 - 100% | Geschwindigkeit, Länge (Pixel) |
+| 39    | Flackern     | LEDs flackern wie Kerzenlicht    | Dauer    | Lichtstärke 0 - 100% |
 
 **Guggen-Übergreifende Effekte**
 
-Kanal | Beschriftung | Beschreibung | Duration | Velocity | Bemerkungen
--- | -- | -- | -- | -- | --
-50 | Random | Zufällige(r) Gugger Leuchten mit gewähltem Effekt | Dauer | Lichtstärke 0 - 100% | Länge (wie viele)
-51 | Wellenüberlauf | Wellenbewegung von links nach rechts in optimaler Formation | Dauer | Lichtstärke 0 - 100% | Speed
-52 | Asynchrones Pulsieren | Alle Gugger pulsieren asynchron | Dauer | Lichtstärke 0 - 100% | Speed
-53 | Farbexplosion | Zufälliger Farbwechsel bei allen Guggern gleichzeitig | Dauer | Lichtstärke 0 - 100% | Speed
+| Kanal | Beschriftung          | Beschreibung                                                | Duration | Velocity             | Bemerkungen       |
+| ----- | --------------------- | ----------------------------------------------------------- | -------- | -------------------- | ----------------- |
+| 50    | Random                | Zufällige(r) Gugger Leuchten mit gewähltem Effekt           | Dauer    | Lichtstärke 0 - 100% | Länge (wie viele) |
+| 51    | Wellenüberlauf        | Wellenbewegung von links nach rechts in optimaler Formation | Dauer    | Lichtstärke 0 - 100% | Speed             |
+| 52    | Asynchrones Pulsieren | Alle Gugger pulsieren asynchron                             | Dauer    | Lichtstärke 0 - 100% | Speed             |
+| 53    | Farbexplosion         | Zufälliger Farbwechsel bei allen Guggern gleichzeitig       | Dauer    | Lichtstärke 0 - 100% | Speed             |
 
 
 
